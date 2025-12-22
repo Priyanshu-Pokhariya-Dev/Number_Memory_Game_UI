@@ -1,5 +1,5 @@
 {
-    "name": "NumberGuessingUI",
+    "name": "Number_Memory_Game_UI",
     "version": 2,
     "builds": [{
         "src": "*.py",
