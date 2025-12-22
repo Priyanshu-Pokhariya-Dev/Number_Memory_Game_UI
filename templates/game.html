@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Memory Game - Playing</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card game-card">
+            <div class="header">
+                <h1>Number Memory Game</h1>
+                <p class="player-info">Player: <span id="player-name">{{ player_name }}</span></p>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="label">Level</span>
+                    <span class="value" id="level">{{ level }}</span>
+                </div>
+            </div>
+
+            <div class="display-area">
+                <div class="sequence-display" id="sequence-display">
+                    <p class="display-text" id="display-text">Loading sequence...</p>
+                </div>
+            </div>
+
+            <div class="content">
+                <form id="answer-form" class="answer-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="user_input">Enter the sequence (space-separated numbers)</label>
+                        <input type="text" id="user_input" name="user_input" placeholder="e.g., 45 23 78 12"
+                            autocomplete="off" />
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit Answer</button>
+                </form>
+
+                <div class="message-area" id="message-area"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const playerName = "{{ player_name }}";
+        const initialSequence = "{{ sequence }}".split(',').map(Number);
+        let currentSequence = [...initialSequence];
+        let gameOver = {{ game_over }};
+
+        function displayNumber(number, duration = 1000) {
+            return new Promise(resolve => {
+                const displayText = document.getElementById('display-text');
+                displayText.textContent = number;
+                displayText.style.opacity = '1';
+
+                setTimeout(() => {
+                    displayText.style.opacity = '0';
+                    setTimeout(resolve, 300);
+                }, duration);
+            });
+        }
+
+        async function playSequence() {
+            const displayText = document.getElementById('display-text');
+            const answerForm = document.getElementById('answer-form');
+
+            // Hide input while showing numbers
+            answerForm.style.display = 'none';
+
+            displayText.style.opacity = '0';
+            document.getElementById('user_input').value = '';
+            document.getElementById('message-area').innerHTML = '';
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            for (const number of currentSequence) {
+                await displayNumber(number, 1500);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Show input only after sequence ends
+            displayText.textContent = 'Your turn!';
+            displayText.style.opacity = '1';
+            answerForm.style.display = 'block';
+            document.getElementById('user_input').focus();
+        }
+
+
+        document.getElementById('answer-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (gameOver) return;
+
+            const formData = new FormData(document.getElementById('answer-form'));
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`/submit-answer/${playerName}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                document.getElementById('level').textContent = result.level;
+
+                if (result.success) {
+                    document.getElementById('message-area').innerHTML = `
+                        <div class="message success">${result.message}</div>
+                    `;
+                    currentSequence = result.sequence.split(',').map(Number);
+                    setTimeout(() => {
+                        playSequence();
+                        submitBtn.disabled = false;
+                    }, 2000);
+                } else if (result.game_over) {
+                    gameOver = true;
+                    document.getElementById('message-area').innerHTML = `
+                        <div class="message error">${result.message}</div>
+                        <div class="end-game-buttons">
+                            <a href="/play-again/${playerName}" class="btn btn-primary">Play Again</a>
+                            <a href="/leaderboard" class="btn btn-secondary">View Leaderboard</a>
+                        </div>
+                    `;
+                    document.getElementById('sequence-display').style.display = 'none';
+                    document.querySelector('.display-area').style.display = 'none';
+                    document.getElementById('answer-form').style.display = 'none';
+                } else {
+                    document.getElementById('message-area').innerHTML = `
+                        <div class="message error">${result.message}</div>
+                    `;
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        document.getElementById('user_input').focus();
+                    }, 2000);
+                }
+            } catch (error) {
+                document.getElementById('message-area').innerHTML = `
+                    <div class="message error">An error occurred. Please try again.</div>
+                `;
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.addEventListener('load', () => {
+            playSequence();
+        });
+    </script>
+</body>
+
+</html>
