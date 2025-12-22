@@ -38,22 +38,43 @@ async def home():
 
 @app.post("/start-game")
 async def start_game(request: Request):
-    form = await request.form()
-    player_name = form.get("player_name", "").strip()
+    try:
+        form = await request.form()
+        player_name = form.get("player_name", "").strip()
 
-    if not player_name:
-        return RedirectResponse("/", status_code=303)
+        # Redirect if name is empty
+        if not player_name:
+            return RedirectResponse("/", status_code=303)
 
-    if not get_player(player_name):
-        create_player(player_name)
+        # Check if player exists in DB, create if not
+        try:
+            player = get_player(player_name)
+            if not player:
+                create_player(player_name)
+        except Exception as db_error:
+            # Return a friendly error if DB fails
+            return HTMLResponse(
+                f"<h2>Database error: {db_error}</h2>"
+                f"<p>Please try again later.</p>", status_code=500
+            )
 
-    game_sessions[player_name] = {
-        "level": 1,
-        "sequence": generate_sequence(1),
-        "game_over": False
-    }
+        # Initialize game session
+        game_sessions[player_name] = {
+            "level": 1,
+            "sequence": generate_sequence(1),
+            "game_over": False
+        }
 
-    return RedirectResponse(f"/game/{player_name}", status_code=303)
+        # Redirect to game page
+        return RedirectResponse(f"/game/{player_name}", status_code=303)
+
+    except Exception as e:
+        # Catch any unexpected error
+        return HTMLResponse(
+            f"<h2>Unexpected server error: {e}</h2>"
+            f"<p>Please try again later.</p>", status_code=500
+        )
+
 
 
 @app.get("/game/{player_name}", response_class=HTMLResponse)
