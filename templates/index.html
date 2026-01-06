@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Memory Game</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <div class="container">
         <div class="card welcome-card">
@@ -15,6 +17,15 @@
             </div>
 
             <div class="content">
+                <form method="POST" action="/start-game" class="name-form">
+                    <div class="form-group">
+                        <label for="player_name">Enter Your Name</label>
+                        <input type="text" id="player_name" name="player_name" placeholder="Your name" required
+                            maxlength="50" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Game</button>
+                </form>
+
                 <div class="instructions">
                     <h2>How to Play</h2>
                     <ul>
@@ -26,27 +37,9 @@
                         <li>Your score is the highest level reached</li>
                     </ul>
                 </div>
-
-                <form method="POST" action="/start-game" class="name-form">
-                    <div class="form-group">
-                        <label for="player_name">Enter Your Name</label>
-                        <input
-                            type="text"
-                            id="player_name"
-                            name="player_name"
-                            placeholder="Your name"
-                            required
-                            maxlength="50"
-                        />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start Game</button>
-                </form>
-            </div>
-
-            <div class="footer-link">
-                <a href="/leaderboard" class="link">View Leaderboard</a>
             </div>
         </div>
     </div>
 </body>
+
 </html>
