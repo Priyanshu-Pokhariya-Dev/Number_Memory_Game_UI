@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enter Name</title>
+    <link rel="stylesheet" href="/static/style.css?v=200">
+</head>
+<body>
+<div class="main-container">
+    <div class="glass-card">
+        <h1 class="title">Almost There!</h1>
+        <form method="POST" action="/start-game">
+            <div class="info-box">
+                <p>Enter your name to start your memory challenge.</p>
+            </div>
+            <input type="text" name="player_name" placeholder="Your Name" required autocomplete="off">
+            <button type="submit" class="heavy-btn" style="border:none; width:100%; margin-top:20px; cursor:pointer;">Start Game</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
