@@ -4,46 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard - Number Memory Game</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=800">
 </head>
 <body>
-    <div class="container">
-        <div class="card leaderboard-card">
+    <div class="main-container">
+        <div class="glass-card" style="max-width: 600px;">
             <div class="header">
-                <h1>Leaderboard</h1>
-                <p class="subtitle">Top Players by Highest Level Reached</p>
+                <h1 class="title">Leaderboard</h1>
+                <p style="color: #666; margin-bottom: 20px;">Top Players by Highest Marks</p>
             </div>
 
-            <div class="content">
-                <div class="leaderboard-table-wrapper">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Player Name</th>
-                                <th>Highest Level</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{ leaderboard_rows }}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="no-players" id="no-players-msg" style="display: none;">
-                    <p>No players yet. Be the first to play!</p>
-                </div>
+            <div class="leaderboard-table-wrapper">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player Name</th>
+                            <th>Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ leaderboard_rows }}
+                    </tbody>
+                </table>
             </div>
 
-            <div class="action-buttons">
-                <a href="/" class="btn btn-primary">Play Game</a>
+            <div id="no-players-msg" style="display: none; margin: 20px 0;">
+                <p>No players yet. Be the first to play!</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <a href="/" class="heavy-btn" style="text-decoration: none;">Play Game</a>
             </div>
         </div>
     </div>
 
     <script>
         const tbody = document.querySelector('tbody');
-        if (tbody.children.length === 0) {
+        if (!tbody || tbody.innerText.trim() === "") {
             document.querySelector('.leaderboard-table-wrapper').style.display = 'none';
             document.getElementById('no-players-msg').style.display = 'block';
         }
